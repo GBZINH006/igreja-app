@@ -6,7 +6,7 @@ const app = express()
 app.use(cors())
 app.use(express.json());
 
-const db = new sqlite3.Database("./IGREJA.db", () => {
+const db = new sqlite3.Database("./IGREJA.db", (err) => {
     if (err) {
         console.log("Erro ao conectar banco de dados")
     } else {
@@ -43,7 +43,7 @@ app.post("/membros", (req, res) => {
             estado,
             telefone_residencial,
             telefone_comercial,
-            telefone celular,
+            telefone_celular,
             profissao,
             ocupacao_atual
             escolaridade,
@@ -81,7 +81,7 @@ app.post("/membros", (req, res) => {
             funcao_extra2,
             chefe_familia,
             nome_conjuge,
-            filhos_quantidade
+            filhos_quantidade,
             computador_casa,
             acessa_internet,
             observacoes,
@@ -112,7 +112,6 @@ app.post("/membros", (req, res) => {
         data.sexo,
         data.estado_civil,
         data.data_nascimento,
-        data.cidade_nascimento,
         data.estado_nascimento,
         data.email,
         data.tipo_sanguineo,
@@ -123,6 +122,11 @@ app.post("/membros", (req, res) => {
         data.cidade,
         data.cep,
         data.estado,
+        data.telefone_residencial,
+        data.telefone_comecial,
+        data.telefone_celular,
+        data.profissao,
+        data.ocupacao_atual,
         data.escolaridade,
         data.cpf,
         data.rg,
@@ -136,12 +140,39 @@ app.post("/membros", (req, res) => {
         data.data_carta,
         data.data_aprovacao,
         data.batizado_es_santo,
-        data.chefe_familia,
-        data.computador_casa,
-        data.acessa_internet,
-        data.data_preenchimento,
-        data.assinatura,
+        data.cargo,
+        data.data_apresentacao,
+        data.dirigente_congregacao,
+        data.dirigente_congregacao_data,
+        data.lider_mocidade,
+        data.lider_mocidade_data,
+        data.professor_ebd,
+        data.professor_ebd_data,
+        data.lider_missoes,
+        data.lider_missoes_data,
+        data.coordenador_geral,
+        data.coordenador_geral_data,
         data.lider_evangelismo,
         data.lider_evangelismo_data,
+        data.lider_culto_familiar,
+        data.lider_culto_familiar_data,
+        data.lider_discipulado,
+        data.lider_discipulado_data,
+        data.funcao_extra1,
+        data.funcao_extra2,
+        data.chefe_familia,
+        data.nome_conjuge,
+        data.filhos_quantidade,
+        data.computador_casa,
+        data.acessa_internet,
+        data.observacoes,
+        data.data_preenchimento,
+        data.assinatura,
+        data.created_at
     ]
+    db.run(sql, values, function (err) {
+        if (err) {
+            return res.status(500).json({ message: err.message})
+        }
+    })
 })
