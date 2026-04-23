@@ -7,6 +7,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/admin", require("./routes/admin"));
 app.use("/cadastro", require("./routes/cadastro"));
+app.use("/admin", require("./routes/adminAuth"));
 
 async function start() {
   await initDB(); 
