@@ -1,72 +1,35 @@
-const initDB = require("../db");
+const jwt = require("jsonwebtoken");
+const { JWT_SECRET } = require("../config/auth");
 
-const authAdmin = async (req, res, next) => {
-    try {
-        const authHeader = req.headers.authorization;
+const authAdmin = (req, res, next) => {
+  const authHeader = req.headers.authorization;
 
-        if (!authHeader) {
-            return res.status(401).json({
-                success: false,
-                message: "Acesso negado. Token não informado"
-            })
-        }
+  if (!authHeader) {
+    return res.status(401).json({
+      success: false,
+      message: "Token não informado"
+    });
+  }
 
-        const [, email] = authHeader.split(" ");
+  const token = authHeader.split(" ")[1];
 
-        if (!email) {
-            return res.status(401).json({
-                success: false,
-                message: "Token inválido"
-            });
-        }
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      message: "Token inválido"
+    });
+  }
 
-        const db = await initDB();
-
-        const stmt = db.prepare(
-            "SELECT * FROM admins WHERE email = ?"
-        );
-
-        stmt.bind([email]);
-
-        let admin = null;
-
-        if (stmt.step()) {
-            admin = stmt.getAsObject();
-        }
-
-        stmt.free();
-
-        if(!admin) {
-            return res.status(403).json({
-                success: false,
-                message: "Administrador não autorizado"
-            });
-        }
-
-        if (admin.ativo !== "SIM") {
-            return res.status(403).json({
-                success: false,
-                message: "Admin desativado"
-            });
-        }
-
-        req.admin = {
-            id: admin.id,
-            nome: admin.nome,
-            email: admin.email,
-            role: admin.role,
-            congregacao: admin.congregacao,
-            setor: admin.setor
-        };
-
-        next();
-    } catch (error) {
-        console.error("Erro no authAdmin:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Erro interno na autenticação"
-        });
-    }
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.admin = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).json({
+      success: false,
+      message: "Token expirado ou inválido"
+    });
+  }
 };
 
 module.exports = authAdmin;

@@ -1,6 +1,8 @@
 const initDB = require('../db');
 const bcrypt = require("bcrypt");
-const fs = require("fs")
+const fs = require("fs");
+const jwt = require("jsonwebtoken")
+const { JWT_SECRET } = require("../config/auth")
 
 exports.login = async (req, res) => {
     try {
@@ -12,6 +14,8 @@ exports.login = async (req, res) => {
                 message: "Email e senha obrigatórios"
             });
         }
+
+        
 
         const db = await initDB();
 
@@ -43,12 +47,17 @@ exports.login = async (req, res) => {
             })
         }
 
+        console.log("EMAIL:", email);
+        console.log("SENHA:", senha);
+        console.log("HASH BANCO:", admin.senha_hash);
+
         const senhaValida = await bcrypt.compare(
             senha,
             admin.senha_hash
         );
-        bcrypt.hash("adbelavist@9", "$2b$10$pXpg1AF4ke8qSdUto/2kFexZHxISF7At0i2jC8wERVA9AS0tJd7TC$2b$10$pXpg1AF4ke8qSdUto/2kFexZHxISF7At0i2jC8wERVA9AS0tJd7TC").then(console.log)
 
+        console.log("CONFERE:", senhaValida);
+    
         if (!senhaValida) {
             return res.status(401).json({
                 success: false,
@@ -63,21 +72,24 @@ exports.login = async (req, res) => {
         updateStmt.run([admin.id])
         updateStmt.free();
 
-        const data = db.export();
-        fs.writeFileSync("IGREJA.db", Buffer.from(data));
-
-        return res.status(200).json({
-            success: true,
-            message: "Login realizado com sucesso",
-            admin: {
+        const token = jwt.sign(
+            {
                 id: admin.id,
-                nome: admin.nome,
                 email: admin.email,
                 role: admin.role,
                 congregacao: admin.congregacao,
                 setor: admin.setor
-            }
+            },
+            JWT_SECRET,
+            { expiresIn: "1h" }
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: "Olá Seja bem vindo Pastor/Admin",
+            token
         });
+
     } catch (error) {
         console.log("🔥 ERRO REAL DO LOGIN ADMIN 🔥");
         console.log(error);
