@@ -5,10 +5,7 @@ exports.cadastrar = async (req, res) => {
   try {
     const dados = req.body;
 
-    /* =====================================================
-       1. TODOS OS CAMPOS OBRIGATÓRIOS DA FICHA
-       (backend é a regra da verdade)
-    ===================================================== */
+   
     const camposObrigatorios = [
       "tipo_pessoa",
       "congregacao",
