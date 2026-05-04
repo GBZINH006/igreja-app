@@ -9,7 +9,7 @@ app.use(express.json());
 
 // rotas
 app.use("/cadastro", require("./routes/cadastro"));
-app.use("/admin", require("./routes/admin"));
+app.use("/admin", require("./routes/admin")); // membros
 app.use("/admin", require("./routes/adminAuth"))
 
 async function start() {

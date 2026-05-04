@@ -1,9 +1,8 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const cadastroController = require("../controllers/cadastroControllers");
+const cadastroController = require("../controllers/cadastroController");
 
-console.log("✅ ROTA /cadastro FOI CARREGADA");
-
-router.post("/", cadastroController.cadastrar)
+router.post("/", cadastroController.cadastrar);
 
 module.exports = router;
+``

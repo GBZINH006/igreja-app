@@ -3,8 +3,10 @@ const initDB = require("../db");
 
 exports.cadastrar = async (req, res) => {
   try {
-    const dados = req.body;
+    const dadosRecebidos = req.body;
+    const dados = {};
 
+<<<<<<< Updated upstream
    
     const camposObrigatorios = [
       "tipo_pessoa",
@@ -174,43 +176,50 @@ exports.cadastrar = async (req, res) => {
     camposPermitidos.forEach((campo) => {
       colunas.push(campo);
       valores.push(dados[campo]);
+=======
+    // normalizar dados
+    Object.entries(dadosRecebidos).forEach(([key, value]) => {
+      if (typeof value === "boolean") dados[key] = value ? "SIM" : "NAO";
+      else if (value === "") dados[key] = null;
+      else dados[key] = value;
+>>>>>>> Stashed changes
     });
 
+    if (!dados.data_preenchimento) {
+      dados.data_preenchimento = new Date().toISOString().split("T")[0];
+    }
+
+    if (!dados.assinatura) {
+      dados.assinatura = "CADASTRO_PUBLICO";
+    }
+
+    const colunas = Object.keys(dados);
+    const valores = Object.values(dados);
     const placeholders = colunas.map(() => "?").join(", ");
+
     const sql = `
       INSERT INTO membros (${colunas.join(", ")})
       VALUES (${placeholders})
     `;
 
-    /* =====================================================
-       4. EXECUTAR NO BANCO + PERSISTIR NO DISCO
-    ===================================================== */
     const db = await initDB();
-
     const stmt = db.prepare(sql);
     stmt.run(valores);
     stmt.free();
 
-    // 🔥 Persistir banco em memória no arquivo físico
     const data = db.export();
-    const buffer = Buffer.from(data);
-    fs.writeFileSync("IGREJA.db", buffer);
+    fs.writeFileSync("IGREJA.db", Buffer.from(data));
 
-    /* =====================================================
-       5. RESPOSTA FINAL
-    ===================================================== */
     return res.status(201).json({
       success: true,
       message: "Cadastro realizado com sucesso"
     });
 
   } catch (error) {
-    console.error("❌ ERRO NO CADASTRO:", error);
-
+    console.error("ERRO CADASTRO:", error);
     return res.status(500).json({
       success: false,
-      message: error.message || "Erro interno do servidor"
+      message: "Erro interno"
     });
   }
 };
-``
